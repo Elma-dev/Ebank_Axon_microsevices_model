@@ -2,25 +2,44 @@ package dev.elma.demo.commands.aggregates;
 
 import dev.elma.demo.commonapi.dtos.CreateAccountCommand;
 import dev.elma.demo.commonapi.enums.AccountStatus;
+import dev.elma.demo.commonapi.events.AccountCreatedEvent;
 import dev.elma.demo.commonapi.exceptions.AccountCommandExceptions;
-import lombok.NoArgsConstructor;
 import org.axonframework.commandhandling.CommandHandler;
+import org.axonframework.eventsourcing.EventSourcingHandler;
+import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
+import org.axonframework.spring.stereotype.Aggregate;
 
 import java.math.BigDecimal;
 
-@NoArgsConstructor // provide by axon
+import static org.axonframework.modelling.command.AggregateLifecycle.apply;
+
+@Aggregate //axonAggregate
 public class AccountAggregate {
+    @AggregateIdentifier
     private String id;
     private BigDecimal balance;
     private String currency;
     private AccountStatus status;
 
-    @CommandHandler
+    protected AccountAggregate() {
+    }
 
-    public AccountAggregate(CreateAccountCommand accountCommand) {
+    @CommandHandler
+    public AccountAggregate(CreateAccountCommand command) {
         //Decision Functions Here
-        if(accountCommand.getBalance().doubleValue()<=0) throw new AccountCommandExceptions("Negative Balance");
-        AggregateLifecycle.apply() // save events
+        if(command.getBalance().doubleValue()<=0) throw new AccountCommandExceptions("Negative Balance");
+        // When all commands are acceptable then we transfer them  to be events and save it in events store
+        AccountCreatedEvent event = new AccountCreatedEvent(command.getId(), command.getBalance(), command.getCurrency(), AccountStatus.CREATED);
+        AggregateLifecycle.apply(event); // save events
+    }
+
+    //Now we create an event handler whose update the state of our account (application)
+    @EventSourcingHandler
+    public void on(AccountCreatedEvent event){
+        this.id=event.getId();
+        this.balance=event.getBalance();
+        this.currency=event.getCurrency();
+        this.status=event.getStatus();
     }
 }

@@ -14,8 +14,7 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/account/command")
 @AllArgsConstructor
 public class AccountCommandController {
-    private CommandGateway commandGateway;
-
+    private final CommandGateway commandGateway;    //private final CommandGateway commandGateway;
     @PostMapping("/save")
     public CompletableFuture<String> saveAccountCommand(@RequestBody CreateAccountCommand accountCommand){
         return commandGateway.send(new CreateAccountCommand(

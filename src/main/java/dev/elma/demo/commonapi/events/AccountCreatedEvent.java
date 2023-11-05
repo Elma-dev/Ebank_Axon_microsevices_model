@@ -5,7 +5,7 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 
-public class AccountCreatedEvent extends BaseEvent{
+public class AccountCreatedEvent extends BaseEvent<String>{
     @Getter private BigDecimal balance;
     @Getter private String currency;
     @Getter private AccountStatus status;
