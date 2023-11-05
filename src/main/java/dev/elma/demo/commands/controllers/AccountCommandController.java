@@ -2,8 +2,9 @@ package dev.elma.demo.commands.controllers;
 
 import dev.elma.demo.commonapi.dtos.CreateAccountCommand;
 import lombok.AllArgsConstructor;
-import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -24,8 +25,8 @@ public class AccountCommandController {
         ));
     }
     @ExceptionHandler(Exception.class)
-    Exception exceptionHandler(Exception e){
-        return e;
+    public ResponseEntity<String> exceptionHandler(Exception e){
+        return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }
