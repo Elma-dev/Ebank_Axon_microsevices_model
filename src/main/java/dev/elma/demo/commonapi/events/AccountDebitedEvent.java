@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 
 @Getter
 public class AccountDebitedEvent extends BaseEvent<String>{
-    private String id;
     private BigDecimal amount;
     private String currency;
 

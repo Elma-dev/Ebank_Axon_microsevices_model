@@ -34,6 +34,7 @@ public class AccountCommandController {
 
     @PostMapping("/debit")
     public CompletableFuture<String> debitFromAccount(@RequestBody DebitAccountCommandDTO debitAccountCommandDTO){
+        System.out.println(debitAccountCommandDTO.getAccountId());
         return commandGateway.send(new DebitAccountCommand(
                 debitAccountCommandDTO.getAccountId(),
                 debitAccountCommandDTO.getAmount(),

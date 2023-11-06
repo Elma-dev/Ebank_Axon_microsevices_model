@@ -52,13 +52,8 @@ public class AccountAggregate {
     @CommandHandler
     public void handle(DebitAccountCommand command){
         if(this.balance.doubleValue()<command.getAmount().doubleValue()) throw new AccountCommandExceptions("Balance insufficient");
-        AggregateLifecycle.apply(
-                new AccountDebitedEvent(
-                     command.getId(),
-                     command.getAmount(),
-                     command.getCurrency()
-                )
-        );
+        AccountDebitedEvent accountDebitedEvent = new AccountDebitedEvent(command.getId().toString(), command.getAmount(), command.getCurrency());
+        AggregateLifecycle.apply(accountDebitedEvent);
 
     }
 
