@@ -1,8 +1,14 @@
 package dev.elma.demo.commands.aggregates;
 
-import dev.elma.demo.commonapi.dtos.CreateAccountCommand;
+import dev.elma.demo.commonapi.commands.CreateAccountCommand;
+import dev.elma.demo.commonapi.commands.CreditAccountCommand;
+import dev.elma.demo.commonapi.commands.DebitAccountCommand;
+import dev.elma.demo.commonapi.dtos.CreditAccountCommandDTO;
+import dev.elma.demo.commonapi.dtos.DebitAccountCommandDTO;
 import dev.elma.demo.commonapi.enums.AccountStatus;
 import dev.elma.demo.commonapi.events.AccountCreatedEvent;
+import dev.elma.demo.commonapi.events.AccountCreditedEvent;
+import dev.elma.demo.commonapi.events.AccountDebitedEvent;
 import dev.elma.demo.commonapi.exceptions.AccountCommandExceptions;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -31,7 +37,7 @@ public class AccountAggregate {
         if(command.getBalance().doubleValue()<=0) throw new AccountCommandExceptions("Negative Balance");
         // When all commands are acceptable then we transfer them  to be events and save it in events store
         AccountCreatedEvent event = new AccountCreatedEvent(command.getId(), command.getBalance(), command.getCurrency(), AccountStatus.CREATED);
-        AggregateLifecycle.apply(event); // save events
+        AggregateLifecycle.apply(event); // publish events
     }
 
     //Now we create an event handler whose update the state of our account (application)
@@ -41,5 +47,41 @@ public class AccountAggregate {
         this.balance=event.getBalance();
         this.currency=event.getCurrency();
         this.status=event.getStatus();
+    }
+
+    @CommandHandler
+    public void handle(DebitAccountCommand command){
+        if(this.balance.doubleValue()<command.getAmount().doubleValue()) throw new AccountCommandExceptions("Balance insufficient");
+        AggregateLifecycle.apply(
+                new AccountDebitedEvent(
+                     command.getId(),
+                     command.getAmount(),
+                     command.getCurrency()
+                )
+        );
+
+    }
+
+    @EventSourcingHandler
+    public void on(AccountDebitedEvent event){
+        this.balance=BigDecimal.valueOf(this.balance.doubleValue()-event.getAmount().doubleValue());
+    }
+
+    @CommandHandler
+    public void handle(CreditAccountCommand command){
+        if(command.getAmount().doubleValue()<=0) throw new AccountCommandExceptions("Negative Amount");
+        AggregateLifecycle.apply(
+                new AccountCreditedEvent(
+                        command.getId(),
+                        command.getAmount(),
+                        command.getCurrency()
+                )
+        );
+
+    }
+
+    @EventSourcingHandler
+    public void on(AccountCreditedEvent event){
+        this.balance=BigDecimal.valueOf(this.balance.doubleValue()+event.getAmount().doubleValue());
     }
 }

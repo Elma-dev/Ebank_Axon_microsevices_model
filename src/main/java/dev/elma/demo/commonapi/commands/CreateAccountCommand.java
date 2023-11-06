@@ -1,6 +1,5 @@
-package dev.elma.demo.commonapi.dtos;
+package dev.elma.demo.commonapi.commands;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
