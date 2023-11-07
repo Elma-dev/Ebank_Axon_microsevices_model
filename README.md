@@ -1,5 +1,8 @@
 # Ebank_Axon_microsevices_model
 This project explains how to use CQRS and event sourcing in general, as well as how to use Axon with Spring Boot in the microservices space.
+```
+ the Axon Framework, a Java framework for building scalable and high-performance event-driven applications. 
+```
 ## 📚Prerequisite
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
@@ -85,3 +88,34 @@ This project explains how to use CQRS and event sourcing in general, as well as 
 ## Class Diagram
 <img width="100%" alt="image" src="https://github.com/Elma-dev/Ebank_Axon_microsevices_model/assets/67378945/fabe8a72-dc56-48a3-94d1-b711cc715f95">
 
+## Commands Building
+```
+There are 3 commands in our application:
+    * Create Account Command
+    * Credit Amount to Account Command
+    * Debit Amount from Account Command
+Also We have Base Command as an abstarct Class
+``` 
+### Create Base Class
+The `@TargetAggregateIdentifier` annotation is often used in command handling methods within an aggregate to specify which field within the aggregate represents the target aggregate identifier. This is important for Axon to route commands to the correct aggregate instance.
+```java
+@AllArgsConstructor
+public abstract class BaseCommand<T> {
+    @TargetAggregateIdentifier
+    @Getter
+    private T id;
+}
+```
+### Create Account Command
+```
+@Getter
+public class CreateAccountCommand extends BaseCommand<String>{
+    private BigDecimal balance;
+    private String currency;
+    public CreateAccountCommand(String id,BigDecimal balance,String currency) {
+        super(id);
+        this.balance=balance;
+        this.currency=currency;
+    }
+}
+```
