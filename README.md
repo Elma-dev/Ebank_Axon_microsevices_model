@@ -79,4 +79,7 @@ This project explains how to use CQRS and event sourcing in general, as well as 
     </tr>
 </table>
 
+## Project: General Schema
+<img width="100%" alt="image" src="https://github.com/Elma-dev/Ebank_Axon_microsevices_model/assets/67378945/3ad9e0a7-c6c9-4af6-b67b-56cfe5661efd">
+
 
