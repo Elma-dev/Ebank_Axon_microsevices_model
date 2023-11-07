@@ -206,3 +206,63 @@ public class AccountDebitedEvent extends BaseEvent<String>{
     }
 }
 ```
+## Aggregate
+`aggregate is a fundamental concept that represents a cluster of related domain objects and encapsulates the business logic and state for a specific part of the domain.`
+```java
+@Aggregate //axonAggregate
+public class AccountAggregate {
+    @AggregateIdentifier
+    private String id;
+    private BigDecimal balance;
+    private String currency;
+    private AccountStatus status;
+    protected AccountAggregate() {
+        //Required By Axon
+    }
+
+    @CommandHandler
+    public AccountAggregate(CreateAccountCommand command) {
+        //Decision Functions Here
+        if(command.getBalance().doubleValue()<=0) throw new AccountCommandExceptions("Negative Balance");
+        // When all commands are acceptable then we transfer them  to be events and save it in events store
+        AccountCreatedEvent event = new AccountCreatedEvent(command.getId(), command.getBalance(), command.getCurrency(), AccountStatus.CREATED);
+        AggregateLifecycle.apply(event); // publish events
+    }
+    //Now we create an event handler whose update the state of our account (application)
+    @EventSourcingHandler
+    public void on(AccountCreatedEvent event){
+        this.id=event.getId();
+        this.balance=event.getBalance();
+        this.currency=event.getCurrency();
+        this.status=event.getStatus();
+    }
+    @CommandHandler
+    public void handle(DebitAccountCommand command){
+        if(this.balance.doubleValue()<command.getAmount().doubleValue()) throw new AccountCommandExceptions("Balance insufficient");
+        AccountDebitedEvent accountDebitedEvent = new AccountDebitedEvent(command.getId().toString(), command.getAmount(), command.getCurrency());
+        AggregateLifecycle.apply(accountDebitedEvent);
+
+    }
+    @EventSourcingHandler
+    public void on(AccountDebitedEvent event){
+        this.balance=BigDecimal.valueOf(this.balance.doubleValue()-event.getAmount().doubleValue());
+    }
+    @CommandHandler
+    public void handle(CreditAccountCommand command){
+        if(command.getAmount().doubleValue()<=0) throw new AccountCommandExceptions("Negative Amount");
+        AggregateLifecycle.apply(
+                new AccountCreditedEvent(
+                        command.getId(),
+                        command.getAmount(),
+                        command.getCurrency()
+                )
+        );
+
+    }
+    @EventSourcingHandler
+    public void on(AccountCreditedEvent event){
+        this.balance=BigDecimal.valueOf(this.balance.doubleValue()+event.getAmount().doubleValue());
+    }
+}
+
+```
