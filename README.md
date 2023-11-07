@@ -89,6 +89,7 @@ This project explains how to use CQRS and event sourcing in general, as well as 
 <img width="100%" alt="image" src="https://github.com/Elma-dev/Ebank_Axon_microsevices_model/assets/67378945/fabe8a72-dc56-48a3-94d1-b711cc715f95">
 
 ## Commands Building
+`Commands are a fundamental concept. They are messages that represent requests to change the state of an aggregate (a domain object).`
 ```
 There are 3 commands in our application:
     * Create Account Command
@@ -146,3 +147,5 @@ public class DebitAccountCommand extends BaseCommand<String>{
     }
 }
 ```
+## Event Building
+`Events are closely related to commands, as mentioned in the previous response. While commands represent requests to perform actions, events represent the results or consequences of those actions.`
