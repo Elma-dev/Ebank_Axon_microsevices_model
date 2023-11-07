@@ -149,3 +149,60 @@ public class DebitAccountCommand extends BaseCommand<String>{
 ```
 ## Event Building
 `Events are closely related to commands, as mentioned in the previous response. While commands represent requests to perform actions, events represent the results or consequences of those actions.`
+```
+There are 3 events in our application:
+    * Create Account event
+    * Credit Amount to Account event
+    * Debit Amount from Account event
+Also We have Base Event as an abstarct Class
+```
+### Create Base Event
+```java
+public abstract class BaseEvent<T> {
+    @Getter private T id;
+    public BaseEvent(T id) {
+        this.id = id;
+    }
+}
+```
+### Create Account Event
+```java
+@Getter
+public class AccountCreatedEvent extends BaseEvent<String>{
+    private BigDecimal balance;
+    private String currency;
+    private AccountStatus status;
+    public AccountCreatedEvent(String id, BigDecimal balance, String currency, AccountStatus status){
+        super(id);
+        this.balance=balance;
+        this.currency=currency;
+        this.status=status;
+    }
+}
+```
+### Create Credit Event
+```java
+@Getter
+public class AccountCreditedEvent extends BaseEvent<String>{
+    private BigDecimal amount;
+    private String currency;
+    public AccountCreditedEvent(String id, BigDecimal amount,String currency){
+        super(id);
+        this.amount=amount;
+        this.currency=currency;
+    }
+}
+```
+### Create Debit Event
+```java
+@Getter
+public class AccountDebitedEvent extends BaseEvent<String>{
+    private BigDecimal amount;
+    private String currency;
+    public AccountDebitedEvent(String id, BigDecimal amount,String currency){
+        super(id);
+        this.amount=amount;
+        this.currency=currency;
+    }
+}
+```
