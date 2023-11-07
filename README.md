@@ -107,7 +107,7 @@ public abstract class BaseCommand<T> {
 }
 ```
 ### Create Account Command
-```
+```java
 @Getter
 public class CreateAccountCommand extends BaseCommand<String>{
     private BigDecimal balance;
@@ -115,6 +115,33 @@ public class CreateAccountCommand extends BaseCommand<String>{
     public CreateAccountCommand(String id,BigDecimal balance,String currency) {
         super(id);
         this.balance=balance;
+        this.currency=currency;
+    }
+}
+```
+### Create Debit Command
+```java
+@Getter
+public class CreditAccountCommand extends BaseCommand<String>{
+    private BigDecimal amount;
+    private String currency;
+    public CreditAccountCommand(String accountId, BigDecimal amount,String currency) {
+        super(accountId);
+        this.amount=amount;
+        this.currency=currency;
+    }
+}
+```
+
+### Create Credit Command
+```java
+@Getter
+public class DebitAccountCommand extends BaseCommand<String>{
+    private BigDecimal amount;
+    private String currency;
+    public DebitAccountCommand(String accountId, BigDecimal amount, String currency) {
+        super(accountId);
+        this.amount=amount;
         this.currency=currency;
     }
 }
